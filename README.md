@@ -28,16 +28,6 @@ A key architectural strength of this system is the **separation of concerns**:
 
 ## 🏗️ 6-Stage Methodology
 
-```mermaid
-flowchart LR
-    S1[Step 1: Data Ingestion & Normalization] --> S2[Step 2: Scenario Construction Layer]
-    S2 --> S3[Step 3: Task Classification (LLM)]
-    S3 --> S4[Step 4: Cost Calculation (Mathematical)]
-    S4 --> S5[Step 5: Offloading Decision (Algorithmic)]
-    S5 --> S6[Step 6: Explanation (LLM)]
-    S5 -.->|Dynamic Re-evaluation Loop| S2
-```
-
 1. **Step 1: Data Ingestion & Normalisation**: Adapts and cleans heterogeneous edge, fog, and cloud datasets into a unified schema.
 2. **Step 2: Scenario Construction Layer**: Synthesizes real-world dynamic network conditions, server queue lengths, and battery status.
 3. **Step 3: Task Classification**: LLM analyzes task attributes (compute intensity, data intensity, latency sensitivity).
