@@ -38,12 +38,16 @@ class RuleBasedDecisionExplainer:
         )
 
         # 3. Why Winner Won
+        deadline_val = decision.candidate_evaluations[winner].deadline_ms
+        if decision.is_deadline_met:
+            deadline_note = f"It satisfied the {deadline_val:.1f}ms deadline with a {decision.slack_time_ms:.1f}ms safety margin."
+        else:
+            deadline_note = f"Although all tiers exceeded the {deadline_val:.1f}ms deadline, {winner.value} minimized overrun to {abs(decision.slack_time_ms):.1f}ms."
+
         why_winner = (
             f"{winner.value} delivered an end-to-end latency of {win_m.total_latency_ms:.1f}ms "
             f"(Compute: {win_m.compute_delay_ms:.1f}ms, Upload: {win_m.upload_delay_ms:.1f}ms, "
-            f"Queue: {win_m.queue_delay_ms:.1f}ms). "
-            f"It satisfied the {decision.candidate_evaluations[winner].deadline_ms:.1f}ms deadline while keeping "
-            f"device battery drain minimal."
+            f"Queue: {win_m.queue_delay_ms:.1f}ms). {deadline_note} It kept device battery drain to {win_m.device_total_energy_j:.3f}J."
         )
 
         # 4. Why Runner-up Lost
@@ -54,12 +58,13 @@ class RuleBasedDecisionExplainer:
             lat_diff = win_m.total_latency_ms - run_m.total_latency_ms
             eng_diff = win_m.device_total_energy_j - run_m.device_total_energy_j
 
-            speed_text = f"{abs(lat_diff):.1f}ms slower" if lat_diff > 0 else f"{abs(lat_diff):.1f}ms faster"
-            energy_text = f"{abs(eng_diff):.3f}J higher energy" if eng_diff > 0 else f"{abs(eng_diff):.3f}J lower energy"
+            # lat_diff < 0 means winner is faster (runner-up is slower)
+            speed_text = f"{abs(lat_diff):.1f}ms faster" if lat_diff < 0 else f"{abs(lat_diff):.1f}ms slower"
+            energy_text = f"{abs(eng_diff):.3f}J lower energy" if eng_diff < 0 else f"{abs(eng_diff):.3f}J higher energy"
 
             why_runner_up = (
                 f"{runner_up.value} was the closest competitor with a cost score of {run_m.composite_cost_score:.3f}. "
-                f"However, {winner.value} prevailed because {runner_up.value} was {speed_text} and had {energy_text}."
+                f"However, {winner.value} prevailed because it was {speed_text} and required {energy_text} than {runner_up.value}."
             )
 
         # 5. Rejection Reasons for All Tiers

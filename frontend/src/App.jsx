@@ -246,18 +246,22 @@ export default function App() {
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          color: '#ffffff',
-          border: '1px solid var(--accent-cyan)',
-          padding: '12px 20px',
+          backgroundColor: '#FFFFFF',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border-color)',
+          padding: '10px 16px',
           borderRadius: 'var(--radius-md)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+          boxShadow: 'var(--shadow-md)',
           zIndex: 300,
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          animation: 'fadeIn 0.25s ease',
+          fontSize: '0.8125rem',
+          fontWeight: 500,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          animation: 'fadeIn 0.2s ease',
         }}>
-          {toastMessage}
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-primary)' }} />
+          <span>{toastMessage}</span>
         </div>
       )}
 

@@ -173,3 +173,6 @@ async def websocket_simulation_endpoint(websocket: WebSocket):
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+    except Exception as e:
+        logger.info(f"WebSocket client disconnected with exception: {e}")
+        manager.disconnect(websocket)

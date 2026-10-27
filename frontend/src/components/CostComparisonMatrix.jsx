@@ -1,22 +1,17 @@
 import React from 'react';
 import { 
-  BarChart3, 
   CheckCircle2, 
   XCircle, 
-  Zap, 
-  Clock, 
-  Award, 
-  Layers, 
-  ArrowUpRight, 
-  TrendingDown
+  Award,
+  Layers
 } from 'lucide-react';
 
 export default function CostComparisonMatrix({ costEvaluation, latestDecision }) {
   if (!costEvaluation || !costEvaluation.tier_evaluations) {
     return (
-      <div className="glass-panel" style={{ padding: '32px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          Run an offloading decision to compute and compare multi-tier physics cost metrics.
+      <div className="card" style={{ padding: '36px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+          Execute an offload decision to compute and compare multi-tier deterministic cost physics.
         </p>
       </div>
     );
@@ -25,53 +20,154 @@ export default function CostComparisonMatrix({ costEvaluation, latestDecision })
   const { tier_evaluations, alpha_latency_weight, beta_energy_weight, deadline_ms } = costEvaluation;
   const winnerTier = latestDecision?.selected_tier;
 
-  const tierColors = {
-    LOCAL: 'var(--tier-local)',
-    EDGE: 'var(--tier-edge)',
-    FOG: 'var(--tier-fog)',
-    CLOUD: 'var(--tier-cloud)',
-  };
-
-  // Find max latency and energy for relative bar scaling
   const allTiers = Object.values(tier_evaluations);
-  const maxLatency = Math.max(...allTiers.map((t) => t.total_latency_ms), deadline_ms || 100);
   const maxEnergy = Math.max(...allTiers.map((t) => t.device_total_energy_j), 0.001);
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Header Info */}
-      <div className="glass-panel" style={{
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Header Info Banner */}
+      <div className="card" style={{
         padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
+        backgroundColor: '#FFFFFF',
       }}>
         <div>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
-            Multi-Tier Deterministic Cost Physics Matrix
+          <h2 style={{ fontSize: '0.975rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            Cost Analysis & Multi-Tier Matrix
           </h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Comparative evaluation of communication delay, execution duration, and device battery energy dissipation
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            Deterministic comparative evaluation of execution latency, communication delays, and device energy draw
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>QoS Deadline: </span>
-            <span className="mono" style={{ fontWeight: 600, color: '#f59e0b' }}>{deadline_ms} ms</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', padding: '5px 10px', borderRadius: 'var(--radius-md)', fontSize: '0.75rem' }}>
+            <span style={{ color: 'var(--text-secondary)' }}>QoS Deadline: </span>
+            <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{deadline_ms} ms</span>
           </div>
-          <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Weights: </span>
-            <span className="mono" style={{ fontWeight: 600, color: '#38bdf8' }}>&alpha;={alpha_latency_weight}</span>
-            <span style={{ color: 'var(--text-muted)' }}> | </span>
-            <span className="mono" style={{ fontWeight: 600, color: '#10b981' }}>&beta;={beta_energy_weight}</span>
+          <div style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', padding: '5px 10px', borderRadius: 'var(--radius-md)', fontSize: '0.75rem' }}>
+            <span style={{ color: 'var(--text-secondary)' }}>Optimization Weights: </span>
+            <span className="mono" style={{ fontWeight: 600, color: 'var(--accent-primary)' }}>&alpha;={alpha_latency_weight}</span>
+            <span style={{ color: 'var(--border-hover)', margin: '0 4px' }}>|</span>
+            <span className="mono" style={{ fontWeight: 600, color: 'var(--status-success)' }}>&beta;={beta_energy_weight}</span>
           </div>
         </div>
       </div>
 
-      {/* Tier Breakdown Cards Grid */}
+      {/* Structured Multi-Tier Comparison Table */}
+      <div className="card" style={{ overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
+        <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--border-color)', backgroundColor: '#F8FAFC' }}>
+          <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            Physics Telemetry Comparison Across Tiers
+          </h3>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>Status</th>
+                <th>Total Latency</th>
+                <th>Upload Tx</th>
+                <th>Queue Wait</th>
+                <th>Execution</th>
+                <th>Downlink Rx</th>
+                <th>Device Energy</th>
+                <th>Slack Margin</th>
+                <th style={{ textAlign: 'right' }}>Composite Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {['LOCAL', 'EDGE', 'FOG', 'CLOUD'].map((tierKey) => {
+                const metrics = tier_evaluations[tierKey];
+                if (!metrics) return null;
+                const isWinner = winnerTier === tierKey;
+                const slack = deadline_ms - metrics.total_latency_ms;
+
+                return (
+                  <tr
+                    key={tierKey}
+                    style={{
+                      backgroundColor: isWinner ? 'var(--accent-subtle)' : undefined,
+                    }}
+                  >
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className={`badge badge-${tierKey.toLowerCase()}`}>{tierKey}</span>
+                        {isWinner && (
+                          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--accent-primary)' }}>
+                            [Selected]
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`badge ${metrics.is_feasible ? 'badge-success' : 'badge-danger'}`}>
+                        {metrics.is_feasible ? 'Feasible' : 'Exceeded'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{
+                        fontWeight: 600,
+                        color: metrics.total_latency_ms <= deadline_ms ? 'var(--text-primary)' : 'var(--status-error)',
+                      }}>
+                        {metrics.total_latency_ms.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ color: 'var(--text-secondary)' }}>
+                        {metrics.upload_delay_ms.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ color: 'var(--text-secondary)' }}>
+                        {metrics.queue_delay_ms.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ color: 'var(--text-secondary)' }}>
+                        {metrics.compute_delay_ms.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ color: 'var(--text-secondary)' }}>
+                        {metrics.download_delay_ms.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {metrics.device_total_energy_j.toFixed(4)} J
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{
+                        fontWeight: 600,
+                        color: slack >= 0 ? 'var(--status-success)' : 'var(--status-error)',
+                      }}>
+                        {slack >= 0 ? `+${slack.toFixed(1)}` : slack.toFixed(1)} ms
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <span className="mono" style={{
+                        fontWeight: 700,
+                        color: isWinner ? 'var(--accent-primary)' : 'var(--text-primary)',
+                      }}>
+                        {metrics.composite_cost_score.toFixed(3)}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Latency & Energy Breakdown Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -82,9 +178,6 @@ export default function CostComparisonMatrix({ costEvaluation, latestDecision })
           if (!metrics) return null;
 
           const isWinner = winnerTier === tierKey;
-          const tierColor = tierColors[tierKey];
-
-          // Sub-component latency percentages
           const totalLat = metrics.total_latency_ms || 1;
           const upPct = (metrics.upload_delay_ms / totalLat) * 100;
           const qPct = (metrics.queue_delay_ms / totalLat) * 100;
@@ -95,128 +188,112 @@ export default function CostComparisonMatrix({ costEvaluation, latestDecision })
           return (
             <div
               key={tierKey}
-              className="glass-panel"
+              className="card"
               style={{
-                padding: '20px',
-                borderColor: isWinner ? tierColor : 'var(--border-color)',
-                boxShadow: isWinner ? `0 0 25px ${tierColor}40` : 'none',
-                position: 'relative',
+                padding: '18px 20px',
+                borderColor: isWinner ? 'var(--accent-primary)' : 'var(--border-color)',
+                boxShadow: isWinner ? '0 0 0 1px var(--accent-primary), var(--shadow-xs)' : 'var(--shadow-xs)',
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
               }}
             >
               {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className={`badge badge-${tierKey.toLowerCase()}`} style={{ fontSize: '0.85rem' }}>
-                    {tierKey}
-                  </span>
+                  <span className={`badge badge-${tierKey.toLowerCase()}`}>{tierKey}</span>
                   {isWinner && (
                     <span className="badge badge-success" style={{ gap: '4px' }}>
-                      <Award size={12} /> WINNER
+                      <Award size={11} /> Optimal
                     </span>
                   )}
                 </div>
 
                 <span className={`badge ${metrics.is_feasible ? 'badge-success' : 'badge-danger'}`}>
-                  {metrics.is_feasible ? (
-                    <>
-                      <CheckCircle2 size={12} /> Feasible
-                    </>
-                  ) : (
-                    <>
-                      <XCircle size={12} /> Infeasible
-                    </>
-                  )}
+                  {metrics.is_feasible ? 'Feasible' : 'Infeasible'}
                 </span>
               </div>
 
-              {/* Composite Score Highlight */}
+              {/* Composite Score */}
               <div style={{
-                background: 'rgba(0, 0, 0, 0.35)',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                marginBottom: '16px',
+                backgroundColor: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Composite Score</span>
-                <span className="mono" style={{ fontSize: '1.1rem', fontWeight: 700, color: tierColor }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Composite Score</span>
+                <span className="mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {metrics.composite_cost_score.toFixed(3)}
                 </span>
               </div>
 
-              {/* Total Latency Metric & Stacked Bar */}
-              <div style={{ marginBottom: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '4px' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Total Latency</span>
-                  <span className="mono" style={{ fontWeight: 600, color: metrics.total_latency_ms <= deadline_ms ? '#34d399' : '#fb7185' }}>
+              {/* Latency Breakdown Bar */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Latency Distribution</span>
+                  <span className="mono" style={{
+                    fontWeight: 600,
+                    color: metrics.total_latency_ms <= deadline_ms ? 'var(--text-primary)' : 'var(--status-error)',
+                  }}>
                     {metrics.total_latency_ms.toFixed(1)} ms
                   </span>
                 </div>
 
-                {/* Stacked Breakdown Bar */}
                 <div style={{
-                  height: '8px',
-                  borderRadius: '4px',
+                  height: '6px',
+                  borderRadius: '3px',
                   overflow: 'hidden',
                   display: 'flex',
-                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  backgroundColor: 'var(--border-color)',
                 }}>
-                  <div style={{ width: `${upPct}%`, backgroundColor: '#38bdf8' }} title={`Upload: ${metrics.upload_delay_ms.toFixed(1)}ms`} />
-                  <div style={{ width: `${qPct}%`, backgroundColor: '#f59e0b' }} title={`Queue: ${metrics.queue_delay_ms.toFixed(1)}ms`} />
-                  <div style={{ width: `${compPct}%`, backgroundColor: '#a855f7' }} title={`Compute: ${metrics.compute_delay_ms.toFixed(1)}ms`} />
-                  <div style={{ width: `${downPct}%`, backgroundColor: '#06b6d4' }} title={`Download: ${metrics.download_delay_ms.toFixed(1)}ms`} />
-                  <div style={{ width: `${rttPct}%`, backgroundColor: '#6366f1' }} title={`RTT: ${metrics.propagation_rtt_ms.toFixed(1)}ms`} />
+                  <div style={{ width: `${upPct}%`, backgroundColor: '#0284C7' }} title={`Upload: ${metrics.upload_delay_ms.toFixed(1)}ms`} />
+                  <div style={{ width: `${qPct}%`, backgroundColor: '#D97706' }} title={`Queue: ${metrics.queue_delay_ms.toFixed(1)}ms`} />
+                  <div style={{ width: `${compPct}%`, backgroundColor: '#7C3AED' }} title={`Compute: ${metrics.compute_delay_ms.toFixed(1)}ms`} />
+                  <div style={{ width: `${downPct}%`, backgroundColor: '#0D9488' }} title={`Download: ${metrics.download_delay_ms.toFixed(1)}ms`} />
+                  <div style={{ width: `${rttPct}%`, backgroundColor: '#4F46E5' }} title={`RTT: ${metrics.propagation_rtt_ms.toFixed(1)}ms`} />
                 </div>
 
-                {/* Delay Sub-values */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', marginTop: '6px', fontSize: '0.65rem' }}>
-                  <div style={{ color: '#38bdf8' }}>Tx: {metrics.upload_delay_ms.toFixed(1)}ms</div>
-                  <div style={{ color: '#f59e0b' }}>Queue: {metrics.queue_delay_ms.toFixed(1)}ms</div>
-                  <div style={{ color: '#a855f7' }}>Exec: {metrics.compute_delay_ms.toFixed(1)}ms</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.6875rem', color: 'var(--text-secondary)' }}>
+                  <span>Tx: {metrics.upload_delay_ms.toFixed(1)}ms</span>
+                  <span>Q: {metrics.queue_delay_ms.toFixed(1)}ms</span>
+                  <span>Exec: {metrics.compute_delay_ms.toFixed(1)}ms</span>
+                  <span>Rx: {metrics.download_delay_ms.toFixed(1)}ms</span>
                 </div>
               </div>
 
-              {/* Device Energy Metric */}
-              <div style={{ marginBottom: '14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '4px' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Device Energy</span>
-                  <span className="mono" style={{ fontWeight: 600, color: '#34d399' }}>
+              {/* Energy Dissipation */}
+              <div style={{
+                paddingTop: '10px',
+                borderTop: '1px solid var(--border-color)',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Device Energy Consumption</span>
+                  <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                     {metrics.device_total_energy_j.toFixed(4)} J
                   </span>
                 </div>
                 <div style={{
-                  height: '6px',
-                  borderRadius: '3px',
-                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  height: '5px',
+                  borderRadius: '2px',
+                  backgroundColor: 'var(--border-color)',
                   overflow: 'hidden',
                 }}>
                   <div style={{
                     width: `${Math.min(100, (metrics.device_total_energy_j / maxEnergy) * 100)}%`,
                     height: '100%',
-                    backgroundColor: '#10b981',
+                    backgroundColor: 'var(--status-success)',
                   }} />
                 </div>
 
-                {/* Energy Sub-values */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', marginTop: '6px', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                  <div>Tx: {metrics.device_tx_energy_j.toFixed(3)}J</div>
-                  <div>Idle: {metrics.device_idle_energy_j.toFixed(3)}J</div>
-                  <div>Comp: {metrics.device_compute_energy_j.toFixed(3)}J</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.6875rem', color: 'var(--text-secondary)' }}>
+                  <span>Tx: {metrics.device_tx_energy_j.toFixed(3)}J</span>
+                  <span>Idle: {metrics.device_idle_energy_j.toFixed(3)}J</span>
+                  <span>Compute: {metrics.device_compute_energy_j.toFixed(3)}J</span>
                 </div>
-              </div>
-
-              {/* Server Infrastructure Energy */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                paddingTop: '8px',
-                borderTop: '1px solid var(--border-color)',
-                fontSize: '0.75rem',
-                color: 'var(--text-muted)',
-              }}>
-                <span>Server Energy:</span>
-                <span className="mono">{metrics.infra_energy_j.toFixed(3)} J</span>
               </div>
             </div>
           );

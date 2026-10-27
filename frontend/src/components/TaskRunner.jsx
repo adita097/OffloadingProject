@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Sliders, 
   Send, 
   Shuffle, 
-  Cpu, 
-  HardDrive, 
-  Clock, 
-  Zap, 
-  CheckCircle,
-  HelpCircle,
-  Sparkles
+  SlidersHorizontal,
+  Zap,
+  Play
 } from 'lucide-react';
 
 export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
@@ -60,22 +55,32 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div className="glass-panel" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="card" style={{ padding: '20px 24px', backgroundColor: '#FFFFFF' }}>
+        {/* Header & Mode Switcher */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          marginBottom: '18px',
+          paddingBottom: '14px',
+          borderBottom: '1px solid var(--border-color)',
+        }}>
           <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff' }}>
-              Offloading Decision Engine & Sandbox
+            <h2 style={{ fontSize: '0.975rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              Decision Engine & Execution Sandbox
             </h2>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Configure workloads or test benchmark scenarios to trigger the 6-stage LangGraph workflow
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              Configure task parameters or select benchmark workloads to trigger multi-tier offload resolution
             </p>
           </div>
 
-          {/* Mode Switcher */}
+          {/* Segmented Control */}
           <div style={{
-            display: 'flex',
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            display: 'inline-flex',
+            backgroundColor: 'var(--bg-tertiary)',
             padding: '3px',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
@@ -84,14 +89,16 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
               type="button"
               onClick={() => setMode('custom')}
               style={{
-                padding: '6px 14px',
+                padding: '5px 12px',
                 borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
-                fontWeight: mode === 'custom' ? 600 : 400,
-                backgroundColor: mode === 'custom' ? 'var(--accent-blue)' : 'transparent',
-                color: mode === 'custom' ? '#ffffff' : 'var(--text-secondary)',
+                fontSize: '0.78rem',
+                fontWeight: mode === 'custom' ? 600 : 500,
+                backgroundColor: mode === 'custom' ? '#FFFFFF' : 'transparent',
+                color: mode === 'custom' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 border: 'none',
+                boxShadow: mode === 'custom' ? 'var(--shadow-xs)' : 'none',
                 cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
             >
               Custom Task Sandbox
@@ -100,14 +107,16 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
               type="button"
               onClick={() => setMode('benchmark')}
               style={{
-                padding: '6px 14px',
+                padding: '5px 12px',
                 borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
-                fontWeight: mode === 'benchmark' ? 600 : 400,
-                backgroundColor: mode === 'benchmark' ? 'var(--accent-blue)' : 'transparent',
-                color: mode === 'benchmark' ? '#ffffff' : 'var(--text-secondary)',
+                fontSize: '0.78rem',
+                fontWeight: mode === 'benchmark' ? 600 : 500,
+                backgroundColor: mode === 'benchmark' ? '#FFFFFF' : 'transparent',
+                color: mode === 'benchmark' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 border: 'none',
+                boxShadow: mode === 'benchmark' ? 'var(--shadow-xs)' : 'none',
                 cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
             >
               Benchmark Dataset
@@ -115,30 +124,38 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
           </div>
         </div>
 
-        {/* Quick Presets (when in Custom mode) */}
+        {/* Quick Presets (Custom Mode) */}
         {mode === 'custom' && (
-          <div style={{ marginBottom: '20px' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-              QUICK WORKLOAD PRESETS:
+          <div style={{ marginBottom: '18px' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>
+              Workload Presets:
             </span>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {taskPresets.map((preset) => (
                 <button
                   key={preset.label}
                   type="button"
                   onClick={() => handleApplyPreset(preset)}
                   style={{
-                    padding: '5px 12px',
+                    padding: '4px 10px',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'var(--bg-tertiary)',
                     border: '1px solid var(--border-color)',
                     color: 'var(--text-primary)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-cyan)'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-subtle)';
+                    e.currentTarget.style.borderColor = 'var(--accent-subtle-border)';
+                    e.currentTarget.style.color = 'var(--accent-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)';
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
                 >
                   {preset.label}
                 </button>
@@ -153,12 +170,14 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '16px',
-              marginBottom: '20px',
+              gap: '14px',
+              marginBottom: '18px',
             }}>
               {/* Task Type */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Semantic Task Category</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  Semantic Task Category
+                </label>
                 <input
                   type="text"
                   className="input-field"
@@ -170,10 +189,10 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
               </div>
 
               {/* Workload GFLOPs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Workload (GFLOPs)</span>
-                  <span className="mono" style={{ color: '#38bdf8', fontWeight: 600 }}>{workload} GFLOPs</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Workload Demand</span>
+                  <span className="mono" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{workload} GFLOPs</span>
                 </div>
                 <input
                   type="range"
@@ -182,15 +201,15 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
                   step="0.2"
                   value={workload}
                   onChange={(e) => setWorkload(parseFloat(e.target.value))}
-                  style={{ accentColor: 'var(--accent-cyan)' }}
+                  style={{ accentColor: 'var(--accent-primary)', marginTop: '6px' }}
                 />
               </div>
 
               {/* Input Data Size MB */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Input Data Payload (MB)</span>
-                  <span className="mono" style={{ color: '#a78bfa', fontWeight: 600 }}>{inputSize} MB</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Input Payload</span>
+                  <span className="mono" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{inputSize} MB</span>
                 </div>
                 <input
                   type="range"
@@ -203,15 +222,15 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
                     setInputSize(val);
                     setOutputSize(Number((val * 0.1).toFixed(2)));
                   }}
-                  style={{ accentColor: 'var(--tier-fog)' }}
+                  style={{ accentColor: 'var(--accent-primary)', marginTop: '6px' }}
                 />
               </div>
 
               {/* Deadline ms */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>QoS Deadline (ms)</span>
-                  <span className="mono" style={{ color: '#f59e0b', fontWeight: 600 }}>{deadline} ms</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>QoS Deadline</span>
+                  <span className="mono" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{deadline} ms</span>
                 </div>
                 <input
                   type="range"
@@ -220,13 +239,15 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
                   step="25"
                   value={deadline}
                   onChange={(e) => setDeadline(parseInt(e.target.value))}
-                  style={{ accentColor: 'var(--accent-amber)' }}
+                  style={{ accentColor: 'var(--accent-primary)', marginTop: '6px' }}
                 />
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Select Benchmark Workload</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '18px' }}>
+              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                Select Ingested Benchmark Task
+              </label>
               <select
                 className="input-field"
                 value={selectedBenchmarkId}
@@ -234,7 +255,7 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
                 style={{ width: '100%' }}
               >
                 {benchmarks.map((b) => (
-                  <option key={b.task_id} value={b.task_id} style={{ background: '#0a0e17' }}>
+                  <option key={b.task_id} value={b.task_id}>
                     {b.task_id} — {b.task_type} ({b.workload_gigaflops} GFLOPs, {b.input_data_size_mb} MB, {b.deadline_ms} ms)
                   </option>
                 ))}
@@ -243,22 +264,21 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
           )}
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading}
-              style={{ minWidth: '180px' }}
             >
               {isLoading ? (
                 <>
-                  <Zap size={16} className="animate-spin" />
-                  <span>Solving Workflow...</span>
+                  <Zap size={14} className="animate-spin" />
+                  <span>Evaluating Routing...</span>
                 </>
               ) : (
                 <>
-                  <Send size={16} />
-                  <span>Execute LangGraph Offload</span>
+                  <Send size={14} />
+                  <span>Run Offload Decision</span>
                 </>
               )}
             </button>
@@ -269,7 +289,7 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
               onClick={handleRandomBenchmark}
               disabled={isLoading}
             >
-              <Shuffle size={16} />
+              <Shuffle size={14} />
               <span>Random Benchmark Task</span>
             </button>
           </div>

@@ -1,25 +1,21 @@
 import React from 'react';
 import { 
   Smartphone, 
+  Radio, 
   Server, 
-  Cpu, 
   Cloud, 
-  Wifi, 
-  Activity, 
   Battery, 
-  BatteryCharging, 
+  Activity, 
   Clock, 
-  Zap, 
-  AlertTriangle,
-  ArrowRight,
-  Radio
+  Check, 
+  Wifi
 } from 'lucide-react';
 
 export default function TopologyOverview({ environment, latestDecision }) {
   if (!environment || !environment.tiers) {
     return (
-      <div className="glass-panel" style={{ padding: '32px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)' }}>Loading topology telemetry...</p>
+      <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Loading topology telemetry...</p>
       </div>
     );
   }
@@ -27,247 +23,301 @@ export default function TopologyOverview({ environment, latestDecision }) {
   const { device, tiers, channels, scenario_name, tick } = environment;
   const winnerTier = latestDecision?.selected_tier;
 
-  const getTierColor = (tierKey) => {
-    switch (tierKey) {
-      case 'LOCAL': return 'var(--tier-local)';
-      case 'EDGE': return 'var(--tier-edge)';
-      case 'FOG': return 'var(--tier-fog)';
-      case 'CLOUD': return 'var(--tier-cloud)';
-      default: return 'var(--accent-cyan)';
-    }
-  };
-
-  const getTierIcon = (tierKey) => {
-    switch (tierKey) {
-      case 'LOCAL': return Smartphone;
-      case 'EDGE': return Radio;
-      case 'FOG': return Server;
-      case 'CLOUD': return Cloud;
-      default: return Cpu;
-    }
+  const tierMeta = {
+    LOCAL: {
+      name: 'Local Device',
+      role: 'On-Device',
+      icon: Smartphone,
+      badgeClass: 'badge-local',
+    },
+    EDGE: {
+      name: 'Edge Server',
+      role: 'MEC 5G',
+      icon: Radio,
+      badgeClass: 'badge-edge',
+    },
+    FOG: {
+      name: 'Fog Gateway',
+      role: 'Regional Node',
+      icon: Server,
+      badgeClass: 'badge-fog',
+    },
+    CLOUD: {
+      name: 'Cloud Data Center',
+      role: 'Hyperscale',
+      icon: Cloud,
+      badgeClass: 'badge-cloud',
+    },
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Top Banner: Scenario overview */}
-      <div className="glass-panel" style={{
-        padding: '16px 20px',
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Compact Environment Summary Bar */}
+      <div className="card" style={{
+        padding: '12px 18px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '12px',
-        background: 'linear-gradient(90deg, rgba(16, 23, 38, 0.9) 0%, rgba(30, 41, 59, 0.6) 100%)',
+        gap: '14px',
+        backgroundColor: '#FFFFFF',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Activity size={20} color="var(--accent-cyan)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Active Environment State
-            </div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Network Scenario
+            </span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
               {scenario_name?.replace(/_/g, ' ')}
-            </div>
+            </span>
           </div>
-        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)' }} />
+
           <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Device Battery</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-              <Battery size={16} color={device.battery_remaining_pct <= 20 ? '#fb7185' : '#34d399'} />
-              <span className="mono" style={{ color: device.battery_remaining_pct <= 20 ? '#fb7185' : '#34d399' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Device Battery
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Battery size={14} color={device.battery_remaining_pct <= 20 ? 'var(--status-error)' : 'var(--status-success)'} />
+              <span className="mono" style={{
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: device.battery_remaining_pct <= 20 ? 'var(--status-error)' : 'var(--text-primary)',
+              }}>
                 {device.battery_remaining_pct.toFixed(1)}%
               </span>
             </div>
           </div>
 
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Simulation Clock</span>
-            <div className="mono" style={{ fontWeight: 600, color: 'var(--accent-cyan)' }}>
-              Tick {tick}
-            </div>
-          </div>
+          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)' }} />
 
-          {latestDecision && (
-            <div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Last Selected Tier</span>
-              <div>
-                <span className={`badge badge-${latestDecision.selected_tier.toLowerCase()}`}>
-                  {latestDecision.selected_tier}
-                </span>
-              </div>
-            </div>
-          )}
+          <div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Simulation Clock
+            </span>
+            <span className="mono" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              Tick #{tick}
+            </span>
+          </div>
         </div>
+
+        {latestDecision && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Latest Route:</span>
+            <span className={`badge badge-${latestDecision.selected_tier.toLowerCase()}`}>
+              {latestDecision.selected_tier}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Interactive 4-Tier Topology Grid */}
+      {/* 4-Tier Resource Cards Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '16px',
       }}>
-        {/* Tier Cards: LOCAL, EDGE, FOG, CLOUD */}
         {['LOCAL', 'EDGE', 'FOG', 'CLOUD'].map((tierKey) => {
           const tierData = tiers[tierKey];
           const channelData = channels[tierKey];
           const isWinner = winnerTier === tierKey;
-          const tierColor = getTierColor(tierKey);
-          const IconComponent = getTierIcon(tierKey);
+          const meta = tierMeta[tierKey];
+          const Icon = meta.icon;
 
           return (
             <div
               key={tierKey}
-              className="glass-panel"
+              className="card"
               style={{
-                padding: '20px',
+                padding: '18px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                borderColor: isWinner ? 'var(--accent-primary)' : 'var(--border-color)',
+                boxShadow: isWinner ? '0 0 0 1px var(--accent-primary), var(--shadow-sm)' : 'var(--shadow-xs)',
+                backgroundColor: '#FFFFFF',
                 position: 'relative',
-                overflow: 'hidden',
-                borderColor: isWinner ? tierColor : 'var(--border-color)',
-                boxShadow: isWinner ? `0 0 25px ${tierColor}40` : 'none',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
-              {/* Highlight Ribbon for Last Winner */}
-              {isWinner && (
-                <div style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '-32px',
-                  background: tierColor,
-                  color: '#000000',
-                  fontSize: '0.65rem',
-                  fontWeight: 800,
-                  padding: '2px 32px',
-                  transform: 'rotate(45deg)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-                  letterSpacing: '0.05em',
-                }}>
-                  ACTIVE WINNER
-                </div>
-              )}
-
               {/* Card Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '8px',
-                    backgroundColor: `${tierColor}20`,
-                    border: `1px solid ${tierColor}60`,
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    color: 'var(--text-secondary)',
                   }}>
-                    <IconComponent size={20} color={tierColor} />
+                    <Icon size={16} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>{tierKey}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <h3 style={{ fontSize: '0.925rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {meta.name}
+                      </h3>
+                      {isWinner && (
+                        <span style={{
+                          fontSize: '0.6875rem',
+                          fontWeight: 600,
+                          color: 'var(--accent-primary)',
+                          backgroundColor: 'var(--accent-subtle)',
+                          border: '1px solid var(--accent-subtle-border)',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-sm)',
+                        }}>
+                          Active Route
+                        </span>
+                      )}
+                    </div>
                     <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                       {tierData ? tierData.node_id : 'N/A'}
                     </span>
                   </div>
                 </div>
 
-                <span className={`badge badge-${tierKey.toLowerCase()}`}>
-                  {tierKey === 'LOCAL' ? 'On-Device' : tierKey === 'EDGE' ? 'MEC 5G' : tierKey === 'FOG' ? 'Regional' : 'Hyperscale'}
+                <span className={`badge ${meta.badgeClass}`}>
+                  {meta.role}
                 </span>
               </div>
 
-              {/* Compute Specs */}
+              {/* Compute Metrics */}
               {tierData && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {/* Compute Speed */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Compute Speed</span>
-                    <span className="mono" style={{ fontWeight: 600, color: '#ffffff' }}>
+                    <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                       {tierData.compute_capacity_gigaflops.toFixed(1)} GFLOPs/s
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                  {/* Queue Length */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Queue Length</span>
-                    <span className="mono" style={{ fontWeight: 600, color: tierData.queue_depth_tasks > 5 ? '#fb7185' : '#ffffff' }}>
+                    <span className="mono" style={{
+                      fontWeight: 600,
+                      color: tierData.queue_depth_tasks > 5 ? 'var(--status-warning)' : 'var(--text-primary)',
+                    }}>
                       {tierData.queue_depth_tasks} tasks ({tierData.queue_delay_ms.toFixed(1)} ms)
                     </span>
                   </div>
 
-                  {/* Utilization Progress Bar */}
-                  <div>
+                  {/* CPU Utilization Bar */}
+                  <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>CPU Utilization</span>
-                      <span className="mono" style={{ color: tierData.utilization_pct > 80 ? '#fb7185' : 'var(--text-secondary)' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>CPU Utilization</span>
+                      <span className="mono" style={{
+                        fontWeight: 600,
+                        color: tierData.utilization_pct > 80 ? 'var(--status-error)' : 'var(--text-secondary)',
+                      }}>
                         {tierData.utilization_pct.toFixed(1)}%
                       </span>
                     </div>
                     <div style={{
                       width: '100%',
-                      height: '6px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      borderRadius: '3px',
+                      height: '4px',
+                      backgroundColor: 'var(--border-color)',
+                      borderRadius: '2px',
                       overflow: 'hidden',
                     }}>
                       <div style={{
-                        width: `${Math.min(100, tierData.utilization_pct)}%`,
+                        width: `${Math.min(100, Math.max(0, tierData.utilization_pct))}%`,
                         height: '100%',
-                        backgroundColor: tierData.utilization_pct > 80 ? '#f43f5e' : tierColor,
-                        transition: 'width 0.4s ease',
+                        backgroundColor: tierData.utilization_pct > 80 ? 'var(--status-error)' : 'var(--accent-primary)',
+                        transition: 'width 0.3s ease',
                       }} />
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                  {/* Power Profile */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Power Profile</span>
-                    <span className="mono" style={{ color: 'var(--text-secondary)' }}>
-                      Active {tierData.active_power_watts.toFixed(1)}W | Idle {tierData.idle_power_watts.toFixed(2)}W
+                    <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      Active {tierData.active_power_watts.toFixed(1)}W · Idle {tierData.idle_power_watts.toFixed(2)}W
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Network Channel Telemetry (for offload tiers) */}
+              {/* Network Channel Telemetry */}
               <div style={{
-                marginTop: '12px',
+                marginTop: 'auto',
                 paddingTop: '12px',
                 borderTop: '1px solid var(--border-color)',
-                fontSize: '0.75rem',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: 'var(--text-muted)' }}>
-                  <Wifi size={14} />
-                  <span>Channel to Device</span>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  marginBottom: '8px',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  color: 'var(--text-secondary)',
+                }}>
+                  <Wifi size={13} />
+                  <span>Channel Measurements</span>
                 </div>
 
                 {channelData ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    <div style={{ background: 'rgba(0,0,0,0.25)', padding: '6px', borderRadius: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.65rem' }}>Uplink Speed</span>
-                      <span className="mono" style={{ fontWeight: 600, color: '#38bdf8' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '6px',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                  }}>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6875rem' }}>Uplink</span>
+                      <span className="mono" style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                         {channelData.uplink_bandwidth_mbps.toFixed(1)} Mbps
                       </span>
                     </div>
-                    <div style={{ background: 'rgba(0,0,0,0.25)', padding: '6px', borderRadius: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.65rem' }}>Round Trip (RTT)</span>
-                      <span className="mono" style={{ fontWeight: 600, color: channelData.rtt_ms > 100 ? '#f59e0b' : '#34d399' }}>
-                        {channelData.rtt_ms.toFixed(1)} ms
-                      </span>
-                    </div>
-                    <div style={{ background: 'rgba(0,0,0,0.25)', padding: '6px', borderRadius: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.65rem' }}>Downlink Speed</span>
-                      <span className="mono" style={{ fontWeight: 600, color: '#a78bfa' }}>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6875rem' }}>Downlink</span>
+                      <span className="mono" style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                         {channelData.downlink_bandwidth_mbps.toFixed(1)} Mbps
                       </span>
                     </div>
-                    <div style={{ background: 'rgba(0,0,0,0.25)', padding: '6px', borderRadius: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.65rem' }}>Packet Loss</span>
-                      <span className="mono" style={{ fontWeight: 600, color: channelData.packet_loss_rate > 0.05 ? '#fb7185' : '#94a3b8' }}>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6875rem' }}>RTT</span>
+                      <span className="mono" style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: channelData.rtt_ms > 100 ? 'var(--status-warning)' : 'var(--text-primary)',
+                      }}>
+                        {channelData.rtt_ms.toFixed(1)} ms
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6875rem' }}>Packet Loss</span>
+                      <span className="mono" style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: channelData.packet_loss_rate > 0.05 ? 'var(--status-error)' : 'var(--text-primary)',
+                      }}>
                         {(channelData.packet_loss_rate * 100).toFixed(2)}%
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', padding: '6px 0' }}>
-                    Zero transmission delay (Local on-device bus)
+                  <div style={{
+                    backgroundColor: 'var(--bg-tertiary)',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontSize: '0.75rem',
+                    color: 'var(--text-secondary)',
+                    textAlign: 'center',
+                  }}>
+                    Zero transmission delay (Internal bus)
                   </div>
                 )}
               </div>

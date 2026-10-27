@@ -72,4 +72,36 @@ A key architectural strength of this system is the **separation of concerns**:
 
 ## 🚀 Getting Started
 
-*(Installation and execution instructions will be documented as each module is implemented)*
+### 1. Prerequisites
+- Python 3.10+
+- Node.js v18+ & npm
+
+### 2. Backend Setup & Execution
+```bash
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run unit tests across all 6 stages
+pytest
+
+# Launch FastAPI server (REST & WebSockets)
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+API Docs available at: `http://127.0.0.1:8000/docs`
+
+### 3. Frontend UI Setup & Execution
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start Vite development dashboard
+npm run dev
+```
+Open your browser at: `http://localhost:5173/`
+
