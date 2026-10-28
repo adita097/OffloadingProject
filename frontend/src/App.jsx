@@ -40,12 +40,20 @@ export default function App() {
   const [selectedDecisionModal, setSelectedDecisionModal] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [decisionNotification, setDecisionNotification] = useState(null);
 
   const wsRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
+  const decisionNotificationTimeoutRef = useRef(null);
 
   const showToast = (msg) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
   };
 
   // 1. Initial REST API Data Load
@@ -208,17 +216,33 @@ export default function App() {
       const updatedStats = await getOffloadStats().catch(() => null);
       if (updatedStats) setStats(updatedStats);
 
-      showToast(`Decision executed: Selected ${res.decision?.selected_tier}`);
-      // Switch view to pipeline or sandbox to show immediate results
-      if (activeTab === 'topology') {
-        // keep on topology to see winner glow, or user can click
+      // Display notification in the dedicated region next to action buttons
+      setDecisionNotification({
+        text: `Decision executed: Selected ${res.decision?.selected_tier}`,
+        tier: res.decision?.selected_tier,
+      });
+      if (decisionNotificationTimeoutRef.current) {
+        clearTimeout(decisionNotificationTimeoutRef.current);
       }
+      decisionNotificationTimeoutRef.current = setTimeout(() => {
+        setDecisionNotification(null);
+      }, 3000);
     } catch (e) {
       console.error('Error running offload decision:', e);
-      showToast(`Offload failed: ${e.message}`);
+      setDecisionNotification({
+        text: `Offload failed: ${e.message}`,
+        isError: true,
+      });
+      if (decisionNotificationTimeoutRef.current) {
+        clearTimeout(decisionNotificationTimeoutRef.current);
+      }
+      decisionNotificationTimeoutRef.current = setTimeout(() => {
+        setDecisionNotification(null);
+      }, 3000);
     } finally {
       setIsLoading(false);
     }
+
   };
 
   // Generate Synthetic Task Batch
@@ -240,7 +264,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Toast Notification */}
+      {/* General System Toast Notification (Scenarios, Simulation, Batch) */}
       {toastMessage && (
         <div style={{
           position: 'fixed',
@@ -249,21 +273,24 @@ export default function App() {
           backgroundColor: '#FFFFFF',
           color: 'var(--text-primary)',
           border: '1px solid var(--border-color)',
-          padding: '10px 16px',
+          padding: '10px 18px',
           borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-md)',
-          zIndex: 300,
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
+          zIndex: 1000,
           fontSize: '0.8125rem',
-          fontWeight: 500,
+          fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          animation: 'fadeIn 0.2s ease',
+          animation: 'toastFadeIn 0.2s ease forwards',
+          pointerEvents: 'none',
         }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent-primary)' }} />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--accent-primary)' }} />
           <span>{toastMessage}</span>
         </div>
       )}
+
+
 
       {/* Top Header Bar */}
       <Header
@@ -302,6 +329,7 @@ export default function App() {
               benchmarks={benchmarks}
               onRunOffload={handleRunOffload}
               isLoading={isLoading}
+              decisionNotification={decisionNotification}
             />
             {workflowState && (
               <WorkflowPipeline workflowState={workflowState} />

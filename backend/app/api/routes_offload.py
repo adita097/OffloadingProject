@@ -17,6 +17,16 @@ router = APIRouter(prefix="/api/offload", tags=["Offloading"])
 # Decision service instance tracking audit history
 decision_service = DecisionService()
 
+# Pre-seed initial benchmark decisions so audit history & distribution stats are immediately populated
+try:
+    _initial_tasks = ingestion_service.load_all_benchmarks()[:6]
+    for _t in _initial_tasks:
+        _wf = execute_offloading_workflow(task=_t, env_manager=env_manager)
+        if _wf.get("decision"):
+            decision_service.decision_history.append(_wf["decision"])
+except Exception:
+    pass
+
 
 class RunOffloadRequest(BaseModel):
     task_id: Optional[str] = Field(default=None, description="ID of an existing benchmark task to offload")

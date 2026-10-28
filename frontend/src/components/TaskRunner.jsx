@@ -7,7 +7,7 @@ import {
   Play
 } from 'lucide-react';
 
-export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
+export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisionNotification }) {
   const [mode, setMode] = useState('custom'); // 'custom' | 'benchmark'
   const [selectedBenchmarkId, setSelectedBenchmarkId] = useState('');
   
@@ -292,6 +292,40 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading }) {
               <Shuffle size={14} />
               <span>Random Benchmark Task</span>
             </button>
+
+            {/* Decision Execution Notification in the user-specified region */}
+            {decisionNotification && (
+              <div
+                className="animate-fade-in"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 14px',
+                  backgroundColor: '#FFFFFF',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-xs)',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                }}
+              >
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: decisionNotification.tier
+                      ? `var(--tier-${decisionNotification.tier.toLowerCase()})`
+                      : (decisionNotification.isError ? 'var(--status-danger)' : 'var(--accent-primary)'),
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <span>{decisionNotification.text}</span>
+              </div>
+            )}
           </div>
         </form>
       </div>

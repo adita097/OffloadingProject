@@ -62,17 +62,30 @@ class DecisionService:
 
     def get_tier_distribution_stats(self) -> dict:
         """Returns statistical distribution of offloading choices made so far."""
-        if not self.decision_history:
-            return {}
+        total = len(self.decision_history)
+        if total == 0:
+            return {
+                "total_decisions": 0,
+                "counts": {"LOCAL": 0, "EDGE": 0, "FOG": 0, "CLOUD": 0},
+                "percentages": {"LOCAL": 0.0, "EDGE": 0.0, "FOG": 0.0, "CLOUD": 0.0},
+                "local_pct": 0.0,
+                "edge_pct": 0.0,
+                "fog_pct": 0.0,
+                "cloud_pct": 0.0,
+            }
 
-        counts = {}
+        counts = {"LOCAL": 0, "EDGE": 0, "FOG": 0, "CLOUD": 0}
         for d in self.decision_history:
-            tier_str = d.selected_tier.value
+            tier_str = d.selected_tier.value if hasattr(d.selected_tier, "value") else str(d.selected_tier)
             counts[tier_str] = counts.get(tier_str, 0) + 1
 
-        total = len(self.decision_history)
+        percentages = {k: round((v / total) * 100, 1) for k, v in counts.items()}
         return {
             "total_decisions": total,
             "counts": counts,
-            "percentages": {k: round((v / total) * 100, 1) for k, v in counts.items()},
+            "percentages": percentages,
+            "local_pct": percentages.get("LOCAL", 0.0),
+            "edge_pct": percentages.get("EDGE", 0.0),
+            "fog_pct": percentages.get("FOG", 0.0),
+            "cloud_pct": percentages.get("CLOUD", 0.0),
         }
