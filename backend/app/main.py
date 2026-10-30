@@ -2,8 +2,10 @@
 Adaptive Offloading Agent - Master FastAPI Application Entrypoint.
 Exposes RESTful endpoints and real-time WebSockets for edge/fog/cloud routing.
 """
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes_scenarios import router as scenarios_router
 from app.api.routes_benchmarks import router as benchmarks_router
@@ -35,6 +37,7 @@ app.include_router(websocket_router)
 
 
 @app.get("/", tags=["Root"])
+@app.get("/api/health", tags=["Root"])
 def root_status():
     """System health and architectural overview."""
     return {
@@ -51,12 +54,21 @@ def root_status():
         },
         "endpoints": {
             "docs": "/docs",
+            "dashboard": "/dashboard",
             "scenarios": "/api/scenarios",
             "benchmarks": "/api/benchmarks",
             "offload": "/api/offload",
             "websocket": "/ws/simulation",
         },
     }
+
+
+# Mount production frontend bundle if built
+frontend_dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+if frontend_dist.exists() and (frontend_dist / "index.html").exists():
+    if (frontend_dist / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+    app.mount("/dashboard", StaticFiles(directory=str(frontend_dist), html=True), name="dashboard")
 
 
 if __name__ == "__main__":

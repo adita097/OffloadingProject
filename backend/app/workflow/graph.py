@@ -90,9 +90,22 @@ def dynamic_reroute_condition(state: OffloadingAgentState) -> Literal["recalcula
 
 def recalculate_costs_node(state: OffloadingAgentState) -> dict:
     """Feedback Loop Node: Adjusts environment parameters and recalculates costs."""
+    decision = state.get("decision")
+    updated_env = state["env_state"].model_copy(deep=True)
+    reason = "Target tier experienced severe queuing congestion before dispatch."
+    if decision:
+        congested_tier = decision.selected_tier
+        if congested_tier in updated_env.tiers:
+            tier_spec = updated_env.tiers[congested_tier]
+            tier_spec.queue_delay_ms += 1500.0
+            tier_spec.queue_depth_tasks += 15
+            tier_spec.utilization_pct = 100.0
+            reason = f"Target tier {congested_tier.value} experienced severe queue saturation ({tier_spec.queue_delay_ms:.0f}ms). Adaptively rerouting."
+
     return {
+        "env_state": updated_env,
         "recalculated": True,
-        "recalculation_reason": "Target tier experienced severe queuing congestion before dispatch.",
+        "recalculation_reason": reason,
         "status": "RECALCULATING",
     }
 

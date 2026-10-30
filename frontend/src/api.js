@@ -2,7 +2,7 @@
  * API and WebSocket client for the Adaptive Offloading Agent.
  */
 
-const API_BASE = '';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export async function fetchJson(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -100,8 +100,9 @@ export class SimulationWebSocket {
   connect() {
     this.isManualClosed = false;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // If running with Vite proxy, connect to window.location.host
-    const wsUrl = `${protocol}//${window.location.host}/ws/simulation`;
+    // If running with Vite proxy or single-port deployment, connect to window.location.host
+    const defaultWsUrl = `${protocol}//${window.location.host}/ws/simulation`;
+    const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
 
     try {
       this.ws = new WebSocket(wsUrl);

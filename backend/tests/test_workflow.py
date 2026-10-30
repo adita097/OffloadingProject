@@ -80,3 +80,22 @@ def test_workflow_under_congested_scenario():
     # Under Edge Congestion, Edge queue is > 800ms, so it should not pick Edge
     decision = final_state["decision"]
     assert decision.selected_tier != TierType.EDGE
+
+
+def test_workflow_adaptive_recalculation_loop():
+    env_manager = EnvironmentManager("NOMINAL_5G")
+    # Artificially set Edge queue delay to 850ms to trigger the conditional reroute check
+    env_state = env_manager.get_current_state()
+    env_state.tiers[TierType.EDGE].queue_delay_ms = 850.0
+
+    task = TaskProfile(
+        task_id="RECALC_TASK_01",
+        workload_gigaflops=2.0,
+        input_data_size_mb=4.0,
+        deadline_ms=40.0  # Infeasible deadline that forces fallback evaluation
+    )
+    final_state = execute_offloading_workflow(task, env_manager)
+    assert final_state["status"] == "COMPLETED"
+    assert final_state["decision"] is not None
+    assert final_state["explanation"] is not None
+
