@@ -1,0 +1,7 @@
+$kind: http-request
+description: Returns the audit log of evaluated offloading decisions with latency, energy, score, and trade-off summaries.
+url: "{{baseUrl}}/api/offload/history?limit=25"
+method: GET
+queryParams:
+  limit: "25"
+order: 4000

@@ -55,9 +55,10 @@ def compute_costs_node(state: OffloadingAgentState) -> dict:
 def make_decision_node(state: OffloadingAgentState) -> dict:
     """Stage 5: Selects the optimal tier using algorithmic constraint optimization."""
     cost_eval = state["cost_evaluation"]
+    strategy = state.get("strategy") or DecisionStrategy.WEIGHTED_COST_MINIMIZATION
     decision = DecisionSelector.select_optimal_tier(
         eval_report=cost_eval,
-        strategy=DecisionStrategy.WEIGHTED_COST_MINIMIZATION,
+        strategy=strategy,
     )
     return {
         "decision": decision,
@@ -150,6 +151,7 @@ compiled_offloading_graph = build_offloading_graph()
 def execute_offloading_workflow(
     task: TaskProfile,
     env_manager: EnvironmentManager,
+    strategy: DecisionStrategy = DecisionStrategy.WEIGHTED_COST_MINIMIZATION,
 ) -> OffloadingAgentState:
     """
     Executes the complete 6-stage pipeline through LangGraph.
@@ -158,6 +160,7 @@ def execute_offloading_workflow(
     initial_state: OffloadingAgentState = {
         "task": task,
         "env_state": env_manager.get_current_state(),
+        "strategy": strategy,
         "classification": None,
         "cost_evaluation": None,
         "decision": None,

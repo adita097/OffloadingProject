@@ -1,0 +1,17 @@
+$kind: http-request
+description: Executes the master 6-stage LangGraph workflow for a custom on-the-fly task.
+url: "{{baseUrl}}/api/offload/run"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "task_type": "autonomous_drone_nav",
+      "workload_gigaflops": 8.5,
+      "input_data_size_mb": 3.5,
+      "output_data_size_mb": 0.2,
+      "deadline_ms": 180.0
+    }
+order: 1000

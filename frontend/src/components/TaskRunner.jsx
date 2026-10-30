@@ -4,12 +4,16 @@ import {
   Shuffle, 
   SlidersHorizontal,
   Zap,
-  Play
+  Play,
+  Scale,
+  Clock,
+  Battery
 } from 'lucide-react';
 
 export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisionNotification }) {
   const [mode, setMode] = useState('custom'); // 'custom' | 'benchmark'
   const [selectedBenchmarkId, setSelectedBenchmarkId] = useState('');
+  const [strategy, setStrategy] = useState('WEIGHTED_COST_MINIMIZATION');
   
   // Custom Task Fields
   const [taskType, setTaskType] = useState('drone_obstacle_avoidance');
@@ -17,6 +21,27 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisi
   const [inputSize, setInputSize] = useState(2.5); // MB
   const [outputSize, setOutputSize] = useState(0.2); // MB
   const [deadline, setDeadline] = useState(250); // ms
+
+  const strategyOptions = [
+    {
+      id: 'WEIGHTED_COST_MINIMIZATION',
+      label: 'Balanced Pareto',
+      desc: 'Optimal trade-off between latency and energy',
+      icon: Scale,
+    },
+    {
+      id: 'LATENCY_MINIMIZATION',
+      label: 'Minimize Latency',
+      desc: 'Prioritize fastest completion (Strict QoS)',
+      icon: Clock,
+    },
+    {
+      id: 'ENERGY_MINIMIZATION',
+      label: 'Minimize Energy',
+      desc: 'Preserve end-device battery life',
+      icon: Battery,
+    },
+  ];
 
   const taskPresets = [
     { label: 'Autonomous Drone Nav', type: 'drone_navigation', gflops: 8.5, inputMb: 3.5, deadlineMs: 180 },
@@ -38,7 +63,10 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisi
   const handleSubmit = (e) => {
     e.preventDefault();
     if (mode === 'benchmark') {
-      onRunOffload({ task_id: selectedBenchmarkId || (benchmarks[0]?.task_id) });
+      onRunOffload({ 
+        task_id: selectedBenchmarkId || (benchmarks[0]?.task_id),
+        strategy: strategy,
+      });
     } else {
       onRunOffload({
         task_type: taskType,
@@ -46,12 +74,13 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisi
         input_data_size_mb: Number(inputSize),
         output_data_size_mb: Number(outputSize),
         deadline_ms: Number(deadline),
+        strategy: strategy,
       });
     }
   };
 
   const handleRandomBenchmark = () => {
-    onRunOffload({});
+    onRunOffload({ strategy });
   };
 
   return (
@@ -262,6 +291,79 @@ export default function TaskRunner({ benchmarks, onRunOffload, isLoading, decisi
               </select>
             </div>
           )}
+
+          {/* Decision Strategy Selector */}
+          <div style={{
+            marginBottom: '20px',
+            padding: '14px 16px',
+            backgroundColor: 'var(--bg-tertiary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                Optimization Strategy
+              </span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                Governs algorithmic tier ranking and objective weights
+              </span>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '10px',
+            }}>
+              {strategyOptions.map((opt) => {
+                const isSelected = strategy === opt.id;
+                const IconComponent = opt.icon;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setStrategy(opt.id)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: '10px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: isSelected
+                        ? '1.5px solid var(--accent-primary)'
+                        : '1px solid var(--border-color)',
+                      backgroundColor: isSelected ? 'var(--accent-subtle)' : '#FFFFFF',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isSelected ? 'var(--shadow-xs)' : 'none',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                      <IconComponent
+                        size={14}
+                        color={isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+                      />
+                      <span style={{
+                        fontSize: '0.8rem',
+                        fontWeight: isSelected ? 600 : 500,
+                        color: isSelected ? 'var(--accent-primary)' : 'var(--text-primary)',
+                      }}>
+                        {opt.label}
+                      </span>
+                    </div>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                      lineHeight: 1.3,
+                      opacity: isSelected ? 0.9 : 0.8,
+                    }}>
+                      {opt.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>

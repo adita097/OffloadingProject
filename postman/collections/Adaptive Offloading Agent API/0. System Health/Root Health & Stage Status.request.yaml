@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns system health, version, and verification that all 6 LangGraph stages are active.
+url: "{{baseUrl}}/"
+method: GET
+order: 1000

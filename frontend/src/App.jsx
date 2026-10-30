@@ -113,7 +113,7 @@ export default function App() {
               classification: data.classification,
               decision: data.decision,
               explanation: data.explanation,
-              cost_evaluation: {
+              cost_evaluation: data.cost_evaluation || {
                 task_id: data.task.task_id,
                 task_type: data.task.task_type,
                 alpha_latency_weight: data.decision.alpha_latency_weight,
@@ -217,8 +217,11 @@ export default function App() {
       if (updatedStats) setStats(updatedStats);
 
       // Display notification in the dedicated region next to action buttons
+      const stratName = res.decision?.strategy === 'LATENCY_MINIMIZATION'
+        ? 'Min Latency'
+        : (res.decision?.strategy === 'ENERGY_MINIMIZATION' ? 'Min Energy' : 'Balanced');
       setDecisionNotification({
-        text: `Decision executed: Selected ${res.decision?.selected_tier}`,
+        text: `Routed to ${res.decision?.selected_tier} (${stratName})`,
         tier: res.decision?.selected_tier,
       });
       if (decisionNotificationTimeoutRef.current) {

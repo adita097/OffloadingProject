@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns statistical metrics (average workload GFLOPs, average payload size MB, average QoS deadline ms).
+url: "{{baseUrl}}/api/benchmarks/summary"
+method: GET
+order: 2000

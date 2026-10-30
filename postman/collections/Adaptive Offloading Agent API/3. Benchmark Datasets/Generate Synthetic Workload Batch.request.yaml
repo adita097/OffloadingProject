@@ -1,0 +1,13 @@
+$kind: http-request
+description: Generates synthetic tasks calibrated to empirical real-world distributions.
+url: "{{baseUrl}}/api/benchmarks/generate"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "count": 10
+    }
+order: 4000

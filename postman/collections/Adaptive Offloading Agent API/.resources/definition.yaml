@@ -1,0 +1,4 @@
+$kind: collection
+description: Complete collection of REST and WebSocket endpoints for the Adaptive Offloading Agent (LangGraph, 4-tier edge routing, cost physics, benchmark ingestion).
+variables:
+  baseUrl: http://127.0.0.1:8000

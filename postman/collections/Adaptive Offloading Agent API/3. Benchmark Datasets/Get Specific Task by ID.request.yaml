@@ -1,0 +1,5 @@
+$kind: http-request
+description: Fetches detailed parameters for a single task by its unique ID.
+url: "{{baseUrl}}/api/benchmarks/KADH_EDGE_0000"
+method: GET
+order: 3000

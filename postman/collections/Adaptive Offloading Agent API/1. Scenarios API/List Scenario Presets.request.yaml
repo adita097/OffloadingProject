@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns all 5 operational scenario presets (NOMINAL_5G, CONGESTED_EDGE, CLOUD_OUTAGE, BATTERY_SAVER, HIGH_MOBILITY_FADING) and shows which is currently active.
+url: "{{baseUrl}}/api/scenarios"
+method: GET
+order: 1000

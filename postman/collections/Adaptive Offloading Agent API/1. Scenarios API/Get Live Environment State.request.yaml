@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns live telemetry for all 4 computing tiers (Local, Edge, Fog, Cloud) including compute capacity, M/M/1 queue delay, power dissipation, and 5G channel measurements.
+url: "{{baseUrl}}/api/scenarios/current"
+method: GET
+order: 2000

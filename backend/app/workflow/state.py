@@ -6,7 +6,7 @@ from typing import TypedDict, Optional, Dict, Any
 from app.ingestion.schemas import TaskProfile, TaskClassification
 from app.scenario.models import EnvironmentState
 from app.cost_model.schemas import TaskCostEvaluation
-from app.decision.schemas import OffloadingDecisionRecord
+from app.decision.schemas import OffloadingDecisionRecord, DecisionStrategy
 from app.explanation.schemas import ExplanationReport
 
 
@@ -18,6 +18,7 @@ class OffloadingAgentState(TypedDict):
     # Inputs
     task: TaskProfile
     env_state: EnvironmentState
+    strategy: Optional[DecisionStrategy]
     
     # Stage 3
     classification: Optional[TaskClassification]

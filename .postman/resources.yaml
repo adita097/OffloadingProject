@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 1cb20ae2-a5f1-4d17-8f4e-eccee8763565
+
+cloudResources:
+  collections:
+    ../postman/collections/Adaptive Offloading Agent API: 7f7f8a45-d302-46b2-95dd-7306d561c006
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

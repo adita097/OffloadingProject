@@ -1,0 +1,13 @@
+$kind: http-request
+description: Executes the 6-stage LangGraph workflow for a specific ingested benchmark task.
+url: "{{baseUrl}}/api/offload/run"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "task_id": "KADH_EDGE_0000"
+    }
+order: 2000

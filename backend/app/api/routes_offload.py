@@ -11,6 +11,7 @@ from app.api.routes_scenarios import env_manager
 from app.api.routes_benchmarks import ingestion_service
 from app.workflow.graph import execute_offloading_workflow
 from app.decision.service import DecisionService
+from app.decision.schemas import DecisionStrategy
 
 router = APIRouter(prefix="/api/offload", tags=["Offloading"])
 
@@ -36,6 +37,10 @@ class RunOffloadRequest(BaseModel):
     input_data_size_mb: Optional[float] = Field(default=None, ge=0.0, description="Payload data in MB")
     output_data_size_mb: Optional[float] = Field(default=0.1, ge=0.0, description="Return data in MB")
     deadline_ms: Optional[float] = Field(default=None, gt=0.0, description="Deadline in ms")
+    strategy: Optional[DecisionStrategy] = Field(
+        default=DecisionStrategy.WEIGHTED_COST_MINIMIZATION,
+        description="Optimization strategy: WEIGHTED_COST_MINIMIZATION, LATENCY_MINIMIZATION, or ENERGY_MINIMIZATION"
+    )
 
 
 @router.post("/run")
@@ -75,7 +80,11 @@ def run_offloading_decision(req: RunOffloadRequest):
         task = random.choice(all_tasks)
 
     # 2. Execute through LangGraph workflow
-    workflow_state = execute_offloading_workflow(task=task, env_manager=env_manager)
+    workflow_state = execute_offloading_workflow(
+        task=task,
+        env_manager=env_manager,
+        strategy=req.strategy or DecisionStrategy.WEIGHTED_COST_MINIMIZATION,
+    )
 
     # 3. Log into decision service history
     if workflow_state.get("decision"):

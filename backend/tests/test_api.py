@@ -101,3 +101,26 @@ def test_offloading_run_custom_and_history():
     stats_resp = client.get("/api/offload/stats")
     assert stats_resp.status_code == 200
     assert stats_resp.json()["total_decisions"] >= 1
+
+
+def test_offloading_run_with_strategy_selection():
+    # Submit with explicit LATENCY_MINIMIZATION strategy
+    payload = {
+        "task_type": "latency_sensitive_nav",
+        "workload_gigaflops": 0.5,
+        "input_data_size_mb": 1.0,
+        "deadline_ms": 500.0,
+        "strategy": "LATENCY_MINIMIZATION",
+    }
+    resp = client.post("/api/offload/run", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["decision"]["strategy"] == "LATENCY_MINIMIZATION"
+
+    # Submit with ENERGY_MINIMIZATION strategy
+    payload["strategy"] = "ENERGY_MINIMIZATION"
+    resp_energy = client.post("/api/offload/run", json=payload)
+    assert resp_energy.status_code == 200
+    data_energy = resp_energy.json()
+    assert data_energy["decision"]["strategy"] == "ENERGY_MINIMIZATION"
+

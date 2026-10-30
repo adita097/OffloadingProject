@@ -1,0 +1,10 @@
+$kind: http-request
+description: Picks a random task from the ingested benchmark catalog and solves the optimal tier.
+url: "{{baseUrl}}/api/offload/run"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: "{}"
+order: 3000

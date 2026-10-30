@@ -1,0 +1,5 @@
+$kind: http-request
+description: Manually advances the discrete event simulation clock by 1 tick.
+url: "{{baseUrl}}/api/scenarios/tick"
+method: POST
+order: 4000

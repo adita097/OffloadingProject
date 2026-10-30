@@ -1,0 +1,14 @@
+$kind: http-request
+name: Select / Switch Scenario
+description: "Switches the active operational environment. Options: NOMINAL_5G, CONGESTED_EDGE, CLOUD_OUTAGE, BATTERY_SAVER, HIGH_MOBILITY_FADING."
+url: "{{baseUrl}}/api/scenarios/select"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "scenario_name": "CONGESTED_EDGE"
+    }
+order: 3000
